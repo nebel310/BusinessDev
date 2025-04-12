@@ -1,4 +1,3 @@
-import uvicorn
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 from fastapi.middleware.cors import CORSMiddleware
@@ -36,17 +35,14 @@ def custom_openapi():
         }
     }
     
-    secured_paths = [
-        "/auth/me",
-        "/auth/logout"
-    ]
-
-    for path in secured_paths:
+    secured_paths = {
+        "/auth/me": {"method": "get", "security": [{"Bearer": []}]},
+        "/auth/logout": {"method": "post", "security": [{"Bearer": []}]},
+    }
+    
+    for path, config in secured_paths.items():
         if path in openapi_schema["paths"]:
-            if path == "/auth/me":
-                openapi_schema["paths"][path]["get"]["security"] = [{"Bearer": []}]
-            elif path == "/auth/logout":
-                openapi_schema["paths"][path]["post"]["security"] = [{"Bearer": []}]
+            openapi_schema["paths"][path][config["method"]]["security"] = config["security"]
     
     app.openapi_schema = openapi_schema
     return app.openapi_schema
@@ -64,11 +60,3 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-
-if __name__ == "__main__":
-    uvicorn.run(
-        "main:app",
-        reload=True
-    )

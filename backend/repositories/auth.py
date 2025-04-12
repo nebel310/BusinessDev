@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from database import new_session
 from models.auth import UserOrm, RefreshTokenOrm, BlacklistedTokenOrm
-from backend.schemas.auth import SUserRegister
+from schemas.auth import SUserRegister
 from sqlalchemy import select, delete
 from passlib.context import CryptContext
 from jose import jwt, JWTError
@@ -34,7 +34,6 @@ class UserRepository:
                 username=user_data.username,
                 email=user_data.email,
                 hashed_password=hashed_password,
-                is_confirmed=user_data.is_confirmed
             )
             session.add(user)
             await session.flush()

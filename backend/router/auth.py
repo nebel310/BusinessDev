@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from backend.schemas.auth import SUserRegister, SUserLogin, SUser
+from schemas.auth import SUserRegister, SUserLogin, SUser
 from repositories.auth import UserRepository
 from models.auth import UserOrm
 from security import create_access_token, get_current_user, oauth2_scheme
