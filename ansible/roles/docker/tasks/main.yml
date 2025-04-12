@@ -1,0 +1,39 @@
+---
+- name: docker | install dependencies
+  apt:
+    update_cache: yes
+    name: "{{ docker_dependencies }}"
+    state: present
+
+- name: docker | ensure repo exists
+  file:
+    path: "{{ docker_path_keyrings }}"
+    state: directory
+    mode: "0755"    
+   
+- name: docker | add docker gpg-key
+  ansible.builtin.get_url:
+    url: "{{ docker_apt_gpg_key }}"
+    dest: "{{ docker_path_gpgkey }}"
+    mode: '0644'    
+
+- name: docker | add docker repo
+  apt_repository:
+    repo: "{{ docker_apt_repository }}"
+    state: present
+    filename: "{{ docker_apt_filename }}"
+    update_cache: yes
+
+- name: docker | install docker
+  apt:
+    name: "{{ docker_packages }}"
+    state: present
+
+- name: docker | ensure docker users are added to the docker group.
+  user:                                                                                                                                                                      
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: true                                                                                                                                                             
+
+- name: docker | reset ssh connect to apply user changes.
+  meta: reset_connection

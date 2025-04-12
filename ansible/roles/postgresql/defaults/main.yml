@@ -1,0 +1,17 @@
+---
+postgresql_db_password: 123456
+postgresql_version: 16
+postgresql_user: postgres
+postgresql_path_pg_conf: "/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf"
+postgresql_path_pg_hba: "/etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf"
+postgresql_path_templates: "/home/{{ ansible_user }}/BusinessDev/ansible/roles/postgresql/templates/"
+postgresql_horilla_ip: 192.168.0.30
+
+
+# pg_hba.conf
+postgresql_db_name: business_db
+postgresql_allowed_ip: "{{ postgresql_horilla_ip }}"
+postgresql_db_user: app
+postgresql_type_auth: md5
+
+

@@ -1,0 +1,10 @@
+- hosts: db
+  become: yes
+  roles:
+    - postgresql
+
+- hosts: app
+  become: yes
+  roles:
+    - docker
+    - app

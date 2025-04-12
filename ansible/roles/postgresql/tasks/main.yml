@@ -1,0 +1,46 @@
+---
+- name: Update cache and Install Postgresql
+  apt:
+    update_cache: yes
+    name: "{{ postgresql_packages }}"
+  notify: Start PostgreSQL
+
+- name: flush handlers
+  meta: flush_handlers
+
+- name: Install dependencies
+  apt:
+    name: "{{ postgresql_python_packages }}"
+
+- name: Configure PostgreSQL to listen on all interfaces
+  lineinfile:
+    path: "{{ postgresql_path_pg_conf }}"
+    regexp: '^#?listen_addresses'
+    line: "listen_addresses = '*'"
+    state: present
+  notify: Restart PostgreSQL
+
+- name: Configure pg_hba.conf to allow connections
+  template:
+    src: "{{ postgresql_path_templates }}pg_hba.j2"  #/home/vagrant/ansible_shlink/roles/postgresql/templates/pg_hba.j2
+    dest: "{{ postgresql_path_pg_hba }}"  #"/etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf"
+    mode: '0644'
+  notify: Restart PostgreSQL
+
+- name: flush handlers
+  meta: flush_handlers
+
+- name: Create Role
+  become_user: postgres
+  community.postgresql.postgresql_user:
+    state: present
+    name: "{{ postgresql_db_user }}"
+    password: "{{ postgresql_db_password }}"
+
+- name: Create Database
+  become_user: postgres
+  community.postgresql.postgresql_db:
+    name: "{{ postgresql_db_name }}"
+    state: present
+
+
