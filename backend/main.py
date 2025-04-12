@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from database import create_tables, delete_tables
 from router.auth import router as auth_router
+from router.video import router as video_router
 
 
 
@@ -38,6 +39,7 @@ def custom_openapi():
     secured_paths = {
         "/auth/me": {"method": "get", "security": [{"Bearer": []}]},
         "/auth/logout": {"method": "post", "security": [{"Bearer": []}]},
+        "/videos/upload": {"method": "post", "security": [{"Bearer": []}]},
     }
     
     for path, config in secured_paths.items():
@@ -51,6 +53,7 @@ def custom_openapi():
 app = FastAPI(lifespan=lifespan)
 app.openapi = custom_openapi
 app.include_router(auth_router)
+app.include_router(video_router)
 
 
 app.add_middleware(

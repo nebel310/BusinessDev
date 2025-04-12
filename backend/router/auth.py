@@ -17,7 +17,7 @@ router = APIRouter(
 async def register_user(user_data: SUserRegister):
     try:
         user_id = await UserRepository.register_user(user_data)
-        return {"success": True, "user_id": user_id, "message": "Подтверждение почты отправлено"}
+        return {"success": True, "user_id": user_id, "message": "Регистрация прошла успешно"}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
