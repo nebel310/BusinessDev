@@ -5,6 +5,7 @@ from models.video import VideoOrm
 from sqlalchemy import select
 from schemas.video import SVideoUpload
 from utils.storage import save_file_to_server
+from utils.video_processing import convert_to_hls
 
 
 
@@ -38,3 +39,30 @@ class VideoRepository:
             query = select(VideoOrm).where(VideoOrm.id == video_id)
             result = await session.execute(query)
             return result.scalars().first()
+    
+    
+    @classmethod
+    async def process_video(cls, video_id: int) -> str:
+        async with new_session() as session:
+            query = select(VideoOrm).where(VideoOrm.id == video_id).with_for_update()
+            result = await session.execute(query)
+            video = result.scalars().first()
+            
+            if not video:
+                raise ValueError("Видео не найдено")
+
+            video.status = "processing"
+            await session.commit()
+
+            output_dir = f"uploads/videos/{video.user_id}/{video.id}/hls"
+            processed_paths = await convert_to_hls(video.original_path, output_dir)
+            if not processed_paths:
+                raise ValueError("Не удалось создать HLS-файлы")
+
+            print(f"Созданы HLS-файлы: {processed_paths}")
+
+            video.processed_path = output_dir
+            video.status = "processed"
+            await session.commit()
+
+            return output_dir

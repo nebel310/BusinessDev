@@ -1,3 +1,4 @@
+import os
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
 from fastapi.responses import FileResponse, StreamingResponse
 from schemas.video import SVideoUpload, SVideo, SVideoHLSPlaylist
@@ -56,3 +57,35 @@ async def get_video(video_id: int):
     if not video:
         raise HTTPException(status_code=404, detail="Видео не найдено")
     return video
+
+
+@router.post("/{video_id}/process")
+async def process_video(video_id: int, current_user: UserOrm = Depends(get_current_user)):
+    try:
+        output_dir = await VideoRepository.process_video(video_id)
+        return {
+            "success": True,
+            "message": "Видео обрабатывается",
+            "hls_path": output_dir
+        }
+    except ValueError as e:
+        raise HTTPException(400, detail=str(e))
+
+
+@router.get("/{video_id}/play")
+async def play_video(video_id: int):
+    video = await VideoRepository.get_video_by_id(video_id)
+    if not video:
+        raise HTTPException(404, "Видео не найдено")
+    if not video.processed_path:
+        raise HTTPException(400, "Видео ещё не обработано")
+
+    master_playlist = f"{video.processed_path}/master.m3u8"
+    if not os.path.exists(master_playlist):
+        raise HTTPException(500, "HLS-плейлист не сгенерирован")
+
+    return FileResponse(
+        master_playlist,
+        media_type="application/vnd.apple.mpegurl",
+        headers={"Cache-Control": "no-cache"}
+    )

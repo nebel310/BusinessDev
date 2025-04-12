@@ -40,6 +40,7 @@ def custom_openapi():
         "/auth/me": {"method": "get", "security": [{"Bearer": []}]},
         "/auth/logout": {"method": "post", "security": [{"Bearer": []}]},
         "/videos/upload": {"method": "post", "security": [{"Bearer": []}]},
+        "/videos/{video_id}/process": {"method": "post", "security": [{"Bearer": []}]},
     }
     
     for path, config in secured_paths.items():
