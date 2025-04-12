@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
 from fastapi.responses import FileResponse, StreamingResponse
 from schemas.video import SVideoUpload, SVideo, SVideoHLSPlaylist
 from repositories.video import VideoRepository
-from security import get_current_user
+from utils.security import get_current_user
 from models.auth import UserOrm
 
 
