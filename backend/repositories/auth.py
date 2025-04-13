@@ -67,6 +67,7 @@ class UserRepository:
             result = await session.execute(query)
             return result.scalars().first()
     
+    
     @classmethod
     async def get_user_by_refresh_token(cls, refresh_token: str) -> UserOrm | None:
         async with new_session() as session:
@@ -97,12 +98,14 @@ class UserRepository:
             await session.commit()
             return refresh_token
 
+
     @classmethod
     async def revoke_refresh_token(cls, user_id: int):
         async with new_session() as session:
             query = delete(RefreshTokenOrm).where(RefreshTokenOrm.user_id == user_id)
             await session.execute(query)
             await session.commit()
+
 
     @classmethod
     async def add_to_blacklist(cls, token: str):

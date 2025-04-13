@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from schemas.auth import SUserRegister, SUserLogin, SUser
 from repositories.auth import UserRepository
 from models.auth import UserOrm
-from security import create_access_token, get_current_user, oauth2_scheme
+from utils.security import create_access_token, get_current_user, oauth2_scheme
 
 
 
@@ -17,7 +17,7 @@ router = APIRouter(
 async def register_user(user_data: SUserRegister):
     try:
         user_id = await UserRepository.register_user(user_data)
-        return {"success": True, "user_id": user_id, "message": "Подтверждение почты отправлено"}
+        return {"success": True, "user_id": user_id, "message": "Регистрация прошла успешно"}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
