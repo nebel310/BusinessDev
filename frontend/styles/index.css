@@ -276,3 +276,50 @@ nav {
     height: 20px;
     fill: #7f8c91;
 }
+
+/* --------------------- PROGRESSBAR ----------------- */
+.progress-container {
+    display: none;
+    width: 100%;
+    margin-top: 20px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 20px;
+    background-color: #4CAF50;
+    text-align: center;
+    line-height: 20px;
+    color: white;
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    display: inline-block;
+    color: white;
+    font-weight: bold;
+}
+
+#upload-file-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #4285f4;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+#upload-file-btn:hover {
+    background-color: #3367d6;
+}
+
+#upload-file-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}

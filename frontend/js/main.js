@@ -2,13 +2,20 @@ document.addEventListener('DOMContentLoaded', function () {
     const fileUploader = document.getElementById('fileUploader');
     const fileInput = document.getElementById('fileInput');
     const errorMessage = document.getElementById('errorMessage');
+
     const fileInfo = document.getElementById('fileInfo');
     const emptyState = document.getElementById('emptyState');
+
     const fileName = document.getElementById('fileName');
     const fileSize = document.getElementById('fileSize');
     const fileType = document.getElementById('fileType');
+
     const clearFileBtn = document.getElementById('clearFileBtn');
     const uploadFileBtn = document.getElementById('upload-file-btn');
+
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
 
     let currentFile = null;
 
@@ -53,11 +60,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
             fileUploader.classList.add('has-file');
             fileInfo.classList.add('anim');
+            uploadFileBtn.disabled = false;
+
+            console.log("Файл:", file);
+            console.log("Тип файла:", file.type);
+            console.log("Размер файла:", file.size);
         } else {
             fileInfo.style.display = 'none';
             emptyState.style.display = 'block';
             fileUploader.classList.remove('has-file');
-
+            uploadFileBtn.disabled = true;
+            hideProgressBar();
             setError('');
         }
     }
@@ -81,7 +94,97 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Обработчик выбора файла
+    // Показать прогресс-бар
+    function showProgressBar() {
+        progressContainer.style.display = 'block';
+        progressBar.style.width = '0%';
+        progressText.textContent = '0%';
+    }
+
+    // Скрыть прогресс-бар
+    function hideProgressBar() {
+        progressContainer.style.display = 'none';
+    }
+
+    // Обновить прогресс-бар
+    function updateProgressBar(percent) {
+        progressBar.style.width = percent + '%';
+        progressText.textContent = percent + '%';
+    }
+
+    // Загрузка файла
+    async function uploadFile() {
+        if (!currentFile) {
+            setError('Выберите файл для загрузки');
+            return;
+        }
+
+        uploadFileBtn.disabled = true;
+        clearFileBtn.disabled = true;
+        showProgressBar();
+        setError('');
+
+        try {
+            const title = encodeURIComponent(currentFile.name);
+            const description = encodeURIComponent('здесь что то должно быть'); //!IMPORTANT Добавить описание(хз какое)
+
+            const url = `http://localhost:3001/videos/upload?title=${title}&description=${description}`;
+
+            const formData = new FormData();
+            formData.append('file', currentFile);
+
+            const config = {
+                headers: {
+                },
+                onUploadProgress: (progressEvent) => {
+                    if (progressEvent.total) {
+                        const percentCompleted = Math.round(
+                            (progressEvent.loaded * 100) / progressEvent.total
+                        );
+                        updateProgressBar(percentCompleted);
+                    }
+                }
+            };
+
+            const token = localStorage.getItem('access_token');
+            if (token) {
+                config.headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            const response = await axios.post(url, formData, config);
+
+            updateProgressBar(100);
+
+            setTimeout(() => {
+                alert(`Видео успешно загружено! ID: ${response.data.id}`);
+                setFile(null);
+                fileInput.value = '';
+                hideProgressBar();
+            }, 500);
+
+        } catch (error) {
+            let errorMsg = 'Ошибка при загрузке видео';
+
+            if (error.response) {
+                console.error('Ошибка от сервера:', error.response);
+                errorMsg = error.response.data.detail || `Ошибка сервера (${error.response.status})`;
+            } else if (error.request) {
+                console.error('Нет ответа от сервера:', error.request);
+                errorMsg = 'Нет ответа от сервера';
+            } else {
+                console.error('Ошибка настройки запроса:', error.message);
+                errorMsg = `Ошибка запроса: ${error.message}`;
+            }
+
+            setError(errorMsg);
+            hideProgressBar();
+        } finally {
+            uploadFileBtn.disabled = false;
+            clearFileBtn.disabled = false;
+        }
+    }
+
+    // Обработчик выбора файла через input
     function handleFileChange(e) {
         setError('');
         const selectedFile = e.target.files[0];
@@ -103,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function () {
         fileInput.value = '';
     }
 
-    // Обработчики Drag an Drop
+    // Обработчики Drag and Drop
     function handleDragEnter(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -144,22 +247,18 @@ document.addEventListener('DOMContentLoaded', function () {
         fileInput.click();
     }
 
-    function uploadFile() {
-        console.log(currentFile);
-
-        // Отправка на сервер
-    }
-
-
     // Инициализация событий
     fileInput.addEventListener('change', handleFileChange);
 
     clearFileBtn.addEventListener('click', clearFile);
-    uploadFileBtn.addEventListener('click', uploadFile)
-    fileUploader.addEventListener('click', handleFileSelect);
+    uploadFileBtn.addEventListener('click', uploadFile);
 
+    fileUploader.addEventListener('click', handleFileSelect);
     fileUploader.addEventListener('dragenter', handleDragEnter);
     fileUploader.addEventListener('dragover', handleDragOver);
     fileUploader.addEventListener('dragleave', handleDragLeave);
     fileUploader.addEventListener('drop', handleDrop);
+
+    uploadFileBtn.disabled = true;
+    hideProgressBar();
 });
