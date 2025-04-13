@@ -36,6 +36,8 @@
     state: present
     name: "{{ postgresql_db_user }}"
     password: "{{ postgresql_db_password }}"
+    priv: "{{ postgresql_priv }}"
+    db: "{{ postgresql_db_name }}"
 
 - name: Create Database
   become_user: postgres

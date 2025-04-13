@@ -1,2 +1,21 @@
 ---
-# tasks file for app
+- name: app | upload local files to remote
+  ansible.builtin.copy:
+    src: "{{ app_src }}"
+    dest: "{{ app_dest }}"
+    owner: "{{ app_owner }}"
+    group: "{{ app_group }}"
+    mode: '0644'
+    directory_mode: '0755'
+
+- name: app | docker pull image 
+  community.docker.docker_image:
+    name: "{{ app_docker_image }}"
+    source: pull
+
+- name: app | run app
+  docker_container:
+    name: "{{ app_container_name }}"
+    image: "{{ app_docker_image }}"
+    ports:
+      - "{{ app_host_port }}:{{ app_app_port }}"

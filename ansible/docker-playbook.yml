@@ -2,4 +2,4 @@
   become: yes
   roles:
     - docker
-    # - app
+    - app
