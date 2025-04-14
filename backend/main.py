@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 from fastapi.middleware.cors import CORSMiddleware
@@ -5,6 +6,7 @@ from contextlib import asynccontextmanager
 from database import create_tables, delete_tables
 from router.auth import router as auth_router
 from router.video import router as video_router
+from utils.kafka_consumer import consume_video_tasks
 
 
 
@@ -15,6 +17,8 @@ async def lifespan(app: FastAPI):
     print('База очищена')
     await create_tables()
     print('База готова к работе')
+    asyncio.create_task(consume_video_tasks())
+    print('Кафка запущена')
     yield
     print('Выключение')
 

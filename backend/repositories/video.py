@@ -6,6 +6,7 @@ from sqlalchemy import select
 from schemas.video import SVideoUpload
 from utils.storage import save_file_to_server
 from utils.video_processing import convert_to_hls
+from utils.kafka_producer import send_video_processing_task
 
 
 
@@ -66,3 +67,16 @@ class VideoRepository:
             await session.commit()
 
             return output_dir
+    
+    
+    @classmethod
+    async def start_video_processing(cls, video_id: int):
+        """Отправляет задачу в Kafka вместо синхронной обработки."""
+        async with new_session() as session:
+            video = await cls.get_video_by_id(video_id)
+            if not video:
+                raise ValueError("Видео не найдено")
+            video.status = "queued"  # Новый статус "в очереди"
+            await session.commit()
+        
+        send_video_processing_task(video_id)  # Отправляем в Kafka
