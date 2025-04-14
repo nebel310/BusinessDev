@@ -73,9 +73,7 @@ async function refreshToken() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                refresh_token: refreshToken
-            })
+            body: refreshToken
         });
 
         const data = await response.json();
