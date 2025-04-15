@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Uploader</title>
+
+    <link rel="stylesheet" href="./styles/reset.css">
+    <link rel="stylesheet" href="./styles/index.css">
+    <link rel="stylesheet" href="./styles/auth-dialogs.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <button id="sign-in-btn" class="auth-btn">Вход</button>
+            <button id="sign-up-btn" class="auth-btn">Регистрация</button>
+            <button id="profile-btn" class="auth-btn" style="display: none;">Профиль</button>
+        </nav>
+    </header>
+
+    <div class="page-container">
+        <h1 class="title-page">Загрузка видео</h1>
+        <p class="formats">
+            Поддерживаемые форматы: MP4, MOV, WMV, AVI, AVCHD, FLV, SWF, F4V, MKV, WEBM
+        </p>
+        <div class="uploader-container">
+            <div class="uploader" id="fileUploader">
+                <div class="blend-mode"></div>
+                <input type="file" id="fileInput" style="display: none;" accept="video/*">
+
+                <div class="upload-empty-state" id="emptyState">
+                    <img class="upload-icon" src="./icons/upload-icon.svg" alt="upload-icon">
+
+                    <p class="upload-text">
+                        Перетащите сюда файл
+                        <span class="tooltip"><span class="tooltip__sign">?</span>
+                            <span class="tooltip__text">
+                                Поддерживаемые форматы: MP4, MOV, WMV, AVI, AVCHD, FLV, SWF, F4V, MKV, WEBM
+                            </span>
+                        </span>
+                    </p>
+                    <p class="upload-text diff-row">или</p>
+                    <div class="btn-container">
+                        <button class="state__btn" id="select-file-btn">Выберите файл</button>
+                    </div>
+                    <p class="error-message" id="errorMessage"></p>
+                </div>
+
+                <div class="upload-file-state">
+                    <div class="file-info" id="fileInfo" style="display: none;">
+                        <div class="file-preview video-preview">
+                            <img class="video-icon" src="./icons/video-icon.svg" alt="video-icon">
+                        </div>
+                        <div class="file-details">
+                            <p class="file-name" id="fileName"></p>
+                            <p class="file-size" id="fileSize"></p>
+                            <p class="file-type" id="fileType"></p>
+                        </div>
+                        <button class="clear-file-btn" id="clearFileBtn" aria-label="Удалить файл">
+                            <img class="trash-icon" src="./icons/trash-icon.svg" alt="trash-icon">
+                        </button>
+                    </div>
+                    <div class="state-btn__container">
+                        <button class="state__btn hidden" id="upload-file-btn">Загрузить</button>
+                    </div>
+                </div>
+
+                <div class="upload-progressbar-state hidden" id="uploadingState">
+                    <svg class="progress-circle" width="410" height="410" viewBox="0 0 300 300">
+                        <circle class="progress-background" cx="150" cy="150" r="140"></circle>
+                        <circle class="progress-bar" id="progressBar" cx="150" cy="150" r="140"></circle>
+                    </svg>
+                    <div class="progress-info">
+                        <p class="percent">0%</p>
+                        <p class="status">Загрузка на сервер</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Диалоговое окно входа -->
+    <dialog id="login-dialog" class="auth-dialog">
+        <div class="auth-container">
+            <div class="dialog-header">
+                <h2>Вход в систему</h2>
+                <button class="close-dialog" data-dialog-close="login-dialog">
+                    <svg viewBox="0 0 24 24">
+                        <path
+                            d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+                    </svg>
+                </button>
+            </div>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Пароль</label>
+                    <input type="password" id="login-password" name="password" required>
+                </div>
+                <div class="btn-container">
+                    <button type="submit" class="btn">Войти</button>
+                </div>
+            </form>
+            <p class="dialog-footer">Нет аккаунта? <a href="#" id="switch-to-register">Зарегистрироваться</a></p>
+            <div id="login-message" class="message"></div>
+        </div>
+    </dialog>
+
+    <!-- Диалоговое окно регистрации -->
+    <dialog id="register-dialog" class="auth-dialog">
+        <div class="auth-container">
+            <div class="dialog-header">
+                <h2>Регистрация</h2>
+                <button class="close-dialog" data-dialog-close="register-dialog">
+                    <svg viewBox="0 0 24 24">
+                        <path
+                            d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+                    </svg>
+                </button>
+            </div>
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="register-username">Имя пользователя</label>
+                    <input type="text" id="register-username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Пароль</label>
+                    <input type="password" id="register-password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password-confirm">Подтверждение пароля</label>
+                    <input type="password" id="register-password-confirm" name="password-confirm" required>
+                </div>
+                <div class="btn-container">
+                    <button type="submit" class="btn">Зарегистрироваться</button>
+                </div>
+            </form>
+            <p class="dialog-footer">Уже есть аккаунт? <a href="#" id="switch-to-login">Войти</a></p>
+            <div id="register-message" class="message"></div>
+        </div>
+    </dialog>
+
+    <!-- Диалоговое окно профиля -->
+    <dialog id="profile-dialog" class="auth-dialog">
+        <div class="auth-container">
+            <div class="dialog-header">
+                <h2>Мой профиль</h2>
+                <button class="close-dialog" data-dialog-close="profile-dialog">
+                    <svg viewBox="0 0 24 24">
+                        <path
+                            d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+                    </svg>
+                </button>
+            </div>
+            <div id="profile-info">
+                <p>Загрузка данных пользователя...</p>
+            </div>
+            <div class="dialog-actions">
+                <button id="logout-btn" class="btn">Выйти</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Диалоговое окно успешной загрузки видео -->
+    <dialog id="success-dialog" class="info-dialog">
+        <div class="info-container">
+            <div class="dialog-info-header">
+                <img src="./icons/success-icon.svg" alt="success">
+                <h2>Файл успешно загружен</h2>
+            </div>
+            <div class="dialog-actions-info">
+                <button id="back-btn" class="btn back-btn">Выбрать файл</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Диалоговое окно c ошибкой загрузки видео -->
+    <dialog id="error-dialog" class="info-dialog">
+        <div class="info-container">
+            <div class="dialog-info-header">
+                <img src="./icons/error-icon.svg" alt="error">
+                <h2>Ошибка при загрузке файла</h2>
+            </div>
+            <div class="error-info">
+                <p>Возможно файл был поврежден. Попробуйте еще раз или загрузите другой файл </p>
+            </div>
+            <div class="dialog-actions-info">
+                <button id="back-btn" class="btn back-btn">Выбрать файл</button>
+            </div>
+        </div>
+    </dialog>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="module" src="./js/main.js"></script>
+    <script type="module" src="./js/auth-dialogs.js"></script>
+</body>
+
+</html>

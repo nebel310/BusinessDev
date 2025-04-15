@@ -1,0 +1,533 @@
+html {
+    font-family: "Montserrat", sans-serif;
+    font-size: 18px;
+}
+
+body {
+    background: url("../icons/background.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 100vh;
+    margin: 0;
+}
+
+.page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.title-page {
+    font-size: 1.8rem;
+    font-weight: 600;
+
+    color: white;
+    text-align: center;
+    margin-top: 75px;
+    margin-bottom: 40px;
+}
+
+/* --------------- HEADER -------------------*/
+
+header {
+    /* height: 50px; */
+    padding: 20px 20px;
+    margin: 0 auto;
+    max-width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+}
+
+nav {
+    display: flex;
+    gap: 10px;
+}
+
+.auth-btn {
+    border: none;
+    background-color: transparent;
+    color: white;
+    cursor: pointer;
+
+    font-size: 1.1rem;
+}
+
+.auth-btn:hover {
+    color: rgb(230, 230, 230);
+    text-decoration: underline;
+}
+
+/* --------------- uploader -------------------*/
+
+.uploader-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 800px;
+    margin: 30px auto;
+}
+
+.uploader {
+    width: 100%;
+    height: 380px;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    background-color: rgb(217, 217, 217, 0.1);
+    mix-blend-mode: plus-lighter;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+
+    box-shadow: 2px 5px 15px rgba(0, 0, 0, 0.25);
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.2);
+
+    border-radius: 10px;
+
+    /* cursor: pointer; */
+    transition: width 0.6s ease,
+        height 0.6s ease,
+        border-radius 0.6s ease,
+        background-color 0.2s ease;
+
+    padding: 20px;
+
+    position: relative;
+    overflow: hidden;
+}
+
+.blend-mode {
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background: linear-gradient(125deg, rgba(255, 255, 255, 0), rgba(255, 0, 0, 0.45));
+    filter: blur(10px);
+    z-index: 0;
+}
+
+.uploader.pulsing {
+    animation: pulse 2s infinite;
+    box-shadow: 0 0 0 0 rgb(70, 123, 172);
+}
+
+@keyframes pulse {
+    0% {
+        /* transform: scale(0.99); */
+        box-shadow: 0 0 0 0 rgba(125, 16, 16, 0.7);
+    }
+
+    70% {
+        /* transform: scale(1); */
+        box-shadow: 0 0 70px 100px rgba(125, 16, 16, 0);
+    }
+
+    100% {
+        /* transform: scale(0.99); */
+        box-shadow: 0 0 0px 0px rgba(125, 16, 16, 0);
+    }
+}
+
+.uploader:hover {
+    /* background-color: #a7ccd3; */
+}
+
+.uploader.dragover {
+    /* background-color: #d3a7a7; */
+}
+
+.uploader.has-file {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.uploader.has-error {
+    /* background-color: #fde8e8;
+    border-color: #f87171; */
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+        transform: translateX(-5px);
+    }
+
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: translateX(5px);
+    }
+}
+
+.shake {
+    animation: shake 0.6s cubic-bezier(.36, .07, .19, .97) both;
+}
+
+/* ----------------------- Стили для пустого состояния -----------------------*/
+.upload-empty-state {
+    text-align: center;
+    z-index: 1;
+}
+
+.upload-icon {
+    margin-bottom: 20px;
+}
+
+.upload-text {
+    color: #ffffff;
+    font-size: 1.1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.upload-text.diff-row {
+    margin: 15px 0;
+}
+
+.upload-hint {
+    font-size: 13px;
+    color: #7f8c91;
+    margin: 5px 0 0 0;
+    text-align: center;
+}
+
+.error-message {
+    color: #bd0000;
+    font-size: 14px;
+    margin-top: 15px;
+    text-align: center;
+    padding: 5px 10px;
+    border-radius: 4px;
+    display: none;
+}
+
+.error-message.visible {
+    display: block;
+}
+
+.state__btn {
+    padding: 9px 13px;
+    background-image: linear-gradient(to left, #090808, #8d0b0b, #8d0b0b, #090808);
+    background-size: 300%;
+    background-position: 0 0;
+    -webkit-appearance: none !important;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    box-shadow: 2px 3px 8px #430606;
+    transition: all ease 0.3s;
+}
+
+.state__btn:hover {
+    background-position: 100% 0;
+    color: #fff;
+}
+
+#upload-file-btn:disabled {
+    /* background-color: #cccccc; */
+    cursor: not-allowed;
+}
+
+/* --------------------------------- TOOLTIP ----------------------------*/
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+
+    width: 20px;
+    height: 20px;
+    background-color: #6868685e;
+    backdrop-filter: blur(20px);
+    border-radius: 50%;
+    margin-left: 5px;
+
+    color: rgb(255, 255, 255);
+
+    font-size: 0.7rem;
+}
+
+.tooltip__sign {
+    pointer-events: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.tooltip__text {
+    font-size: 0.7rem;
+    line-height: 1rem;
+
+    visibility: hidden;
+    width: 15vw;
+    min-width: 140px;
+
+    background-color: #311212ef;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltip:hover .tooltip__text {
+    visibility: visible;
+    opacity: 1;
+}
+
+.formats {
+    display: none;
+    color: rgb(199, 199, 199);
+
+    font-size: 0.8rem;
+    line-height: 1.2rem;
+    text-align: center;
+}
+
+/* ---------------------- Стили для отображения информации о файле -------------------*/
+.upload-file-state {
+    width: 100%;
+    z-index: 1;
+}
+
+.file-info {
+    display: flex;
+    width: 85%;
+    align-items: center;
+    padding: 15px;
+    margin: 50px auto;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    box-sizing: border-box;
+}
+
+.file-info.anim {
+    animation: slit-in-horizontal 0.5s linear 0s 1 normal none;
+}
+
+@keyframes slit-in-horizontal {
+
+    0% {
+        transform: translateZ(-800px) rotateX(90deg);
+        opacity: 0;
+    }
+
+    20% {
+        transform: translateZ(-160px) rotateX(87deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateZ(0) rotateX(0);
+    }
+}
+
+.file-preview {
+    margin-right: 10px;
+}
+
+.file-details {
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.file-name {
+    font-weight: bold;
+    /* width: 100%; */
+    margin: 0 0 5px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.file-size {
+    color: #7f8c91;
+    margin: 0 0 5px 0;
+    font-size: 14px;
+}
+
+.file-type {
+    color: #8da7ad;
+    margin: 0;
+    font-size: 12px;
+}
+
+.clear-file-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    margin-left: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s;
+}
+
+.clear-file-btn:hover {
+    background-color: #f0f2f5;
+}
+
+.state-btn__container {
+    width: 100%;
+    text-align: center;
+}
+
+.state__btn.hidden {
+    display: none;
+    cursor: not-allowed;
+}
+
+/* --------------------- Стили для состояния загрузки ----------------- */
+
+.uploader.uploading {
+    border-radius: 50%;
+    width: 410px;
+    height: 410px;
+}
+
+.upload-progressbar-state {
+    position: relative;
+}
+
+.upload-progressbar-state.hidden {
+    display: none;
+}
+
+.progress-info {
+    color: white;
+    z-index: 1;
+    position: relative;
+    text-align: center;
+}
+
+.progress-info .percent {
+    font-size: 5rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.progress-info .status {
+    font-size: 1.1rem;
+}
+
+/* --------------------- PROGRESSBAR ----------------- */
+.progress-circle {
+    position: absolute;
+    transform: rotate(-90deg);
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) rotate(-90deg);
+}
+
+.progress-background {
+    fill: none;
+    stroke: #7a2828;
+    stroke-width: 20;
+}
+
+.progress-bar {
+    fill: none;
+    stroke: #ff9898;
+    stroke-width: 20;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.5s ease;
+}
+
+@media (max-width: 700px) {
+    body {
+        background: url("../icons/background-mobile.png");
+        background-size: cover;
+        background-repeat: no-repeat;
+    }
+
+    .tooltip {
+        display: none;
+    }
+
+    .title-page {
+        margin-top: 40px;
+    }
+
+    .formats {
+        display: block;
+    }
+
+    .upload-text {
+        display: none;
+    }
+
+    .file-info {
+        flex-direction: column;
+        background-color: transparent;
+        box-shadow: none;
+        color: white;
+        text-align: center;
+        margin: 10px auto;
+    }
+
+    .file-preview {
+        margin-right: 0;
+        margin-left: 5px;
+    }
+
+    .clear-file-btn {
+        padding: 4px;
+        margin-top: 5px;
+        margin-left: 0;
+    }
+
+    .uploader.uploading {
+        width: 225px;
+        height: 225px;
+    }
+
+    .progress-info .percent {
+        font-size: 3.5rem;
+    }
+
+    .progress-info .status {
+        font-size: 0.9rem;
+    }
+
+    .progress-background {
+        stroke-width: 10;
+    }
+
+    .progress-bar {
+        stroke-width: 10;
+    }
+
+    .progress-circle circle {
+        r: 78;
+    }
+
+}

@@ -32,15 +32,15 @@ services:
       retries: 5
   
 
-  # frontend:
-  #   build: ./frontend
-  #   container_name: frontend
-  #   ports:
-  #     - "5500:5500"  #Если меняете этот порт, то пишите в тг: @vlados7529
-  #   volumes:
-  #     - ./frontend:/app
-  #   depends_on:
-  #     - web  # Зависит от сервера (FastAPI)
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "5500:5500"  #Если меняете этот порт, то пишите в тг: @vlados7529
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - web  # Зависит от сервера (FastAPI)
 
 volumes:
   postgres_data:
