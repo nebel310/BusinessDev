@@ -37,3 +37,8 @@
 
 - name: docker | reset ssh connect to apply user changes.
   meta: reset_connection
+
+- name: docker | docker log into Dockerhub
+  community.docker.docker_login:
+    username: andrey444
+    password: x8-uY.6ScikQ&92

@@ -5,7 +5,7 @@ postgresql_user: postgres
 postgresql_path_pg_conf: "/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf"
 postgresql_path_pg_hba: "/etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf"
 postgresql_path_templates: "/home/{{ ansible_user }}/BusinessDev/ansible/roles/postgresql/templates/"
-postgresql_horilla_ip: 51.250.24.183
+postgresql_horilla_ip: 192.168.0.30
 postgresql_priv: "ALL"
 
 # pg_hba.conf
