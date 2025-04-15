@@ -18,12 +18,17 @@
     name: "andrey444/front_hack:0.2"
     source: pull
 
-- name: app | run app
-  docker_container:
-    name: "{{ app_container_name }}"
-    image: "{{ app_docker_image }}"
-    ports:
-      - "{{ app_host_port }}:{{ app_app_port }}"
+- name: app | docker pull kafka
+  community.docker.docker_image:                                                                                                                                             
+    name: "bitnami/kafka:4.0"
+    source: pull  
+
+      #- name: app | run app
+      #docker_container:
+      # name: "{{ app_container_name }}"
+      # image: "{{ app_docker_image }}"
+      # ports:
+      # - "{{ app_host_port }}:{{ app_app_port }}"
 
 - name: app | template docker-compose
   template:

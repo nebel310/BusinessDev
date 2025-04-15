@@ -1,16 +1,31 @@
-version: '3.9'
-
-services:
+services:                                                                                                                                                                    
   web:
-    image: andrey444/hack:0.3
+    image: andrey444/hack:0.4
     container_name: fastapi_app
     ports:
       - "3001:3001"
   
-  frontend:
-    image: andrey44/front_hack:0.2
+  kafka:                                                                                                                                                                     
+    image: bitnami/kafka:4.0
+    container_name: kafka
+    ports:                                                                                                                                                                   
+      - "9092:9092"  # Порт для клиентов                                                                                                                                     
+    environment:                                                                                                                                                             
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+    depends_on:                                                                                                                                                              
+      - web
+
+  frontend:                                                                                                                                                                  
+    image: andrey444/front_hack:0.2
     container_name: frontend
-    ports:
-      - "5500:5500"  #Если меняете этот порт, то пишите в тг: @vlados7529
-    depends_on:
-      - web  # Зависит от сервера (FastAPI)
+    ports:                                                                                                                                                                   
+      - "5500:5500"  #Если меняете этот порт, то пишите в тг: @vlados7529                                                                                                    
+    depends_on:                                                                                                                                                              
+      - web  # Зависит от сервера (FastAPI)    
