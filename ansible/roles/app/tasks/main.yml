@@ -8,9 +8,14 @@
     mode: '0644'
     directory_mode: '0755'
 
-- name: app | docker pull image 
+- name: app | docker pull backed image 
   community.docker.docker_image:
     name: "{{ app_docker_image }}"
+    source: pull
+
+- name: app | docker pull frontend image
+  community.docker.docker_image:
+    name: "andrey444/front_hack:0.2"
     source: pull
 
 - name: app | run app
@@ -19,3 +24,16 @@
     image: "{{ app_docker_image }}"
     ports:
       - "{{ app_host_port }}:{{ app_app_port }}"
+
+- name: app | template docker-compose
+  template:
+    src: /home/user/BusinessDev/ansible/roles/app/templates/docker-compose.j2
+    dest: "{{ app_dest }}/docker-compose.yml"
+    owner: "{{ app_owner }}"
+    group: "{{ app_group }}"
+    mode: '0644'
+
+- name: app | run docker-compose
+  community.docker.docker_compose_v2:
+    project_src: "{{ app_dest }}"
+

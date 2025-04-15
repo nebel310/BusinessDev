@@ -2,13 +2,13 @@ version: '3.9'
 
 services:
   web:
-    image: hack:0.3
+    image: andrey444/hack:0.3
     container_name: fastapi_app
     ports:
       - "3001:3001"
   
   frontend:
-    image: front_hack:0.1
+    image: andrey44/front_hack:0.2
     container_name: frontend
     ports:
       - "5500:5500"  #Если меняете этот порт, то пишите в тг: @vlados7529
