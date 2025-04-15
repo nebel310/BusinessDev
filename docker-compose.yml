@@ -30,6 +30,7 @@ services:
     build: ./backend
     container_name: fastapi_app
     environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:123456@db:5432/business_db
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
       kafka:
