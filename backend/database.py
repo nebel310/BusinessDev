@@ -9,7 +9,7 @@ from sqlalchemy.orm import DeclarativeBase
 load_dotenv()
 
 engine = create_async_engine(
-    os.getenv('DATABASE_URL', 'postgresql+asyncpg://app:123456@localhost:5432/business_db')
+    os.getenv('DATABASE_URL', 'postgresql+asyncpg://app:123456@db:5432/business_db')
 )
 
 new_session = async_sessionmaker(engine, expire_on_commit=False)

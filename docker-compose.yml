@@ -1,26 +1,38 @@
 services:
-  web:
+  web:  
     build: ./backend
     container_name: fastapi_app
     ports:
       - "3001:3001"
-  
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:123456@db:5432/business_db
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092  # Добавлено для FastAPI
+    depends_on:
+      - kafka
+      - db
+
   kafka:
     image: bitnami/kafka:4.0
     container_name: kafka
     ports:
-      - "9092:9092"  # Порт для клиентов
+      - "9092:9092"
+      - "9093:9093"  # Добавлен порт для контроллера
     environment:
       - KAFKA_CFG_NODE_ID=1
       - KAFKA_CFG_PROCESS_ROLES=controller,broker
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9092
       - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
-      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT 
-    depends_on: 
-      - web
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true  # Разрешить автоматическое создание топиков
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "9092"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
   db:
     image: postgres:17.2
     container_name: postgres_db
