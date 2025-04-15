@@ -1,3 +1,8 @@
+//TODO Добавить логику проверки статуса обработки видео
+//TODO Добавить ошибку в диалоговое окно - "ошибка сервера"
+//!BUG баг с refresh - "POST /auth/refresh HTTP/1.1" 422 Unprocessable Content
+//!BUG при нажатии enter в диалоговом окне, закрывает окно, должно сабмитить
+
 document.addEventListener('DOMContentLoaded', function () {
     const fileUploader = document.getElementById('fileUploader');
     const fileInput = document.getElementById('fileInput');
@@ -5,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const fileInfo = document.getElementById('fileInfo');
     const emptyState = document.getElementById('emptyState');
+    const uploadingState = document.getElementById('uploadingState');
 
     const fileName = document.getElementById('fileName');
     const fileSize = document.getElementById('fileSize');
@@ -12,12 +18,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const clearFileBtn = document.getElementById('clearFileBtn');
     const uploadFileBtn = document.getElementById('upload-file-btn');
-
-    const progressContainer = document.getElementById('progressContainer');
-    const progressBar = document.getElementById('progressBar');
-    const progressText = document.getElementById('progressText');
+    // const selectFileBtn = document.getElementById('select-file-btn');
 
     let currentFile = null;
+    let processingInterval = null;
 
     const acceptedVideoTypes = [
         'video/mp4',              // MP4
@@ -61,6 +65,12 @@ document.addEventListener('DOMContentLoaded', function () {
             fileUploader.classList.add('has-file');
             fileInfo.classList.add('anim');
             uploadFileBtn.disabled = false;
+            uploadFileBtn.classList.remove('hidden');
+
+            fileUploader.removeEventListener('dragleave', handleDragLeave);
+            fileUploader.removeEventListener('dragenter', handleDragEnter);
+            fileUploader.removeEventListener('dragover', handleDragOver);
+            fileUploader.removeEventListener('drop', handleDrop);
 
             console.log("Файл:", file);
             console.log("Тип файла:", file.type);
@@ -70,8 +80,11 @@ document.addEventListener('DOMContentLoaded', function () {
             emptyState.style.display = 'block';
             fileUploader.classList.remove('has-file');
             uploadFileBtn.disabled = true;
-            hideProgressBar();
+            uploadFileBtn.classList.add('hidden');
+            // hideProgressBar();
             setError('');
+
+            initDndListeners();
         }
     }
 
@@ -94,39 +107,72 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Показать прогресс-бар
-    function showProgressBar() {
-        progressContainer.style.display = 'block';
-        progressBar.style.width = '0%';
-        progressText.textContent = '0%';
+    // Прогресс бар
+    function updateCircularProgress(percent) {
+        const progressBar = document.querySelector('.progress-bar');
+        const percentElement = document.querySelector('.percent');
+        const statusElement = document.querySelector('.status');
+
+        let radius;
+        if (window.matchMedia('(max-width: 700px)').matches) {
+            radius = 78;
+        } else {
+            radius = 140;
+        }
+
+        const circumference = 2 * Math.PI * radius;
+
+        const offset = circumference * (1 - (percent / 100));
+
+        progressBar.style.strokeDasharray = `${circumference}`;
+        progressBar.style.strokeDashoffset = offset;
+
+        percentElement.textContent = `${Math.round(percent)}%`;
+
+        if (percent === 100) {
+            statusElement.textContent = 'Загрузка завершена';
+        } else if (percent === 95) {
+            statusElement.textContent = 'Обработка видео';
+        } else if (percent > 0) {
+            statusElement.textContent = 'Загрузка на сервер';
+        }
     }
 
-    // Скрыть прогресс-бар
-    function hideProgressBar() {
-        progressContainer.style.display = 'none';
+    function showCircularProgress() {
+        const uploadingState = document.getElementById('uploadingState');
+        uploadingState.classList.remove('hidden');
+
+
+        updateCircularProgress(0);
     }
 
-    // Обновить прогресс-бар
-    function updateProgressBar(percent) {
-        progressBar.style.width = percent + '%';
-        progressText.textContent = percent + '%';
+    function hideCircularProgress() {
+        const uploadingState = document.getElementById('uploadingState');
+        uploadingState.classList.add('hidden');
+    }
+
+    // Проверка статуса обработки видео
+    async function checkStatusVideo(videoId) {
+        //* Логика проверки статуса
+        console.log("Проверка статуса...");
     }
 
     // Загрузка файла
     async function uploadFile() {
-        if (!currentFile) {
-            setError('Выберите файл для загрузки');
-            return;
-        }
-
         uploadFileBtn.disabled = true;
         clearFileBtn.disabled = true;
-        showProgressBar();
+
+        showCircularProgress();
+        await transformToCicle();
+
         setError('');
+
+        //! Проверка на авторизацию должна быть, кастомная ошибка
 
         try {
             const title = encodeURIComponent(currentFile.name);
-            const description = encodeURIComponent('здесь что то должно быть'); //!IMPORTANT Добавить описание(хз какое)
+            const description = encodeURIComponent('здесь что то должно быть');
+            //! Заменить описание
 
             const url = `http://localhost:3001/videos/upload?title=${title}&description=${description}`;
 
@@ -141,7 +187,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         const percentCompleted = Math.round(
                             (progressEvent.loaded * 100) / progressEvent.total
                         );
-                        updateProgressBar(percentCompleted);
+                        updateCircularProgress(Math.max(0, percentCompleted - 5));
                     }
                 }
             };
@@ -153,17 +199,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const response = await axios.post(url, formData, config);
 
-            updateProgressBar(100);
+            const videoId = response.data.id;
+            console.log(response);
 
-            setTimeout(() => {
-                alert(`Видео успешно загружено! ID: ${response.data.id}`);
+            // updateCircularProgress(100);
+
+            setTimeout(() => successDialog.showModal(), 1000);
+
+            try {
+                await checkStatusVideo(videoId);
+
+                //TODO Тут всплыть окно после успешной обработки видео
+
+            } catch (error) {
+                console.error('Ошибка при проверке статуса:', error);
                 setFile(null);
                 fileInput.value = '';
-                hideProgressBar();
-            }, 500);
+            }
 
         } catch (error) {
             let errorMsg = 'Ошибка при загрузке видео';
+            errorDialog.showModal();
 
             if (error.response) {
                 console.error('Ошибка от сервера:', error.response);
@@ -177,11 +233,20 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             setError(errorMsg);
-            hideProgressBar();
+            hideCircularProgress();
         } finally {
             uploadFileBtn.disabled = false;
             clearFileBtn.disabled = false;
         }
+    }
+
+    async function transformToCicle() {
+        fileInfo.style.display = 'none';
+        uploadFileBtn.classList.add('hidden');
+        fileUploader.classList.remove('has-file');
+        fileUploader.classList.add('uploading');
+        uploadingState.classList.remove('hidden');
+        await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
     // Обработчик выбора файла через input
@@ -206,29 +271,43 @@ document.addEventListener('DOMContentLoaded', function () {
         fileInput.value = '';
     }
 
-    // Обработчики Drag and Drop
+    let dragCounter = 0;
+
+    // Обработчики dnd
     function handleDragEnter(e) {
         e.preventDefault();
         e.stopPropagation();
-        fileUploader.classList.add('dragover', 'pulsing');
+        dragCounter++;
+        console.log("enter");
+        if (dragCounter === 1) {
+            fileUploader.classList.add('dragover', 'pulsing');
+        }
     }
 
     function handleDragOver(e) {
         e.preventDefault();
         e.stopPropagation();
+        console.log("over");
     }
 
     function handleDragLeave(e) {
         e.preventDefault();
         e.stopPropagation();
-        fileUploader.classList.remove('dragover', 'pulsing');
+        dragCounter--;
+        console.log("leave");
+        if (dragCounter === 0) {
+            fileUploader.classList.remove('dragover', 'pulsing');
+        }
     }
 
     function handleDrop(e) {
         e.preventDefault();
         e.stopPropagation();
+        console.log("drop");
         fileUploader.classList.remove('dragover', 'pulsing');
         setError('');
+
+        dragCounter = 0
 
         const droppedFiles = e.dataTransfer.files;
         if (droppedFiles.length > 0) {
@@ -244,7 +323,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Обработчик клика по области
     function handleFileSelect() {
-        fileInput.click();
+        if (!currentFile) {
+            fileInput.click();
+        }
+    }
+
+    function initDndListeners() {
+        fileUploader.addEventListener('dragleave', handleDragLeave);
+        fileUploader.addEventListener('dragenter', handleDragEnter);
+        fileUploader.addEventListener('dragover', handleDragOver);
+        fileUploader.addEventListener('drop', handleDrop);
     }
 
     // Инициализация событий
@@ -254,11 +342,54 @@ document.addEventListener('DOMContentLoaded', function () {
     uploadFileBtn.addEventListener('click', uploadFile);
 
     fileUploader.addEventListener('click', handleFileSelect);
-    fileUploader.addEventListener('dragenter', handleDragEnter);
-    fileUploader.addEventListener('dragover', handleDragOver);
-    fileUploader.addEventListener('dragleave', handleDragLeave);
-    fileUploader.addEventListener('drop', handleDrop);
+    initDndListeners();
+
+    // Окна с успехом/ошибкой
+    const successDialog = document.getElementById('success-dialog');
+    const errorDialog = document.getElementById('error-dialog');
+
+    document.querySelectorAll('.back-btn').forEach(button => {
+        button.addEventListener('click', reset)
+    })
+
+    function reset() {
+        currentFile = null;
+        fileInput.value = '';
+
+        if (processingInterval) {
+            clearInterval(processingInterval);
+            processingInterval = null;
+        }
+
+        if (successDialog && typeof successDialog.close === 'function') {
+            successDialog.close();
+        }
+        if (errorDialog && typeof errorDialog.close === 'function') {
+            errorDialog.close();
+        }
+
+        fileInfo.style.display = 'none';
+        emptyState.style.display = 'block';
+        uploadingState.classList.add('hidden');
+
+        fileUploader.classList.remove('has-file', 'has-error', 'uploading');
+        uploadFileBtn.disabled = true;
+        uploadFileBtn.classList.add('hidden');
+        clearFileBtn.disabled = false;
+
+        setError('');
+
+        hideCircularProgress();
+
+        initDndListeners();
+
+        dragCounter = 0;
+    }
+
+    function hideProgressBar() {
+        hideCircularProgress();
+    }
 
     uploadFileBtn.disabled = true;
-    hideProgressBar();
+    // hideProgressBar();
 });

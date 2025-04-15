@@ -1,5 +1,14 @@
+html {
+    font-family: "Montserrat", sans-serif;
+    font-size: 18px;
+}
+
 body {
-    background-color: #040e22;
+    background: url("../icons/background.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 100vh;
+    margin: 0;
 }
 
 .page-container {
@@ -8,33 +17,45 @@ body {
     padding: 0 20px;
 }
 
+.title-page {
+    font-size: 1.8rem;
+    font-weight: 600;
+
+    color: white;
+    text-align: center;
+    margin-top: 75px;
+    margin-bottom: 40px;
+}
+
 /* --------------- HEADER -------------------*/
 
 header {
-    height: 50px;
-    padding: 0 20px;
+    /* height: 50px; */
+    padding: 20px 20px;
     margin: 0 auto;
-    max-width: 1200px;
+    max-width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: end;
 }
 
 nav {
     display: flex;
-    justify-content: end;
     gap: 10px;
 }
 
 .auth-btn {
-    padding: 7px 5px;
     border: none;
-    border-radius: 8px;
-
-    background-color: #a44c4c;
+    background-color: transparent;
     color: white;
     cursor: pointer;
+
+    font-size: 1.1rem;
 }
 
 .auth-btn:hover {
-    background-color: #b15050;
+    color: rgb(230, 230, 230);
+    text-decoration: underline;
 }
 
 /* --------------- uploader -------------------*/
@@ -49,19 +70,47 @@ nav {
 
 .uploader {
     width: 100%;
-    height: 300px;
+    height: 380px;
+    box-sizing: border-box;
+
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: #dbe5e7;
-    border: 2px dashed #7f8c91;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s ease;
+
+    background-color: rgb(217, 217, 217, 0.1);
+    mix-blend-mode: plus-lighter;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+
+    box-shadow: 2px 5px 15px rgba(0, 0, 0, 0.25);
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.2);
+
+    border-radius: 10px;
+
+    /* cursor: pointer; */
+    transition: width 0.6s ease,
+        height 0.6s ease,
+        border-radius 0.6s ease,
+        background-color 0.2s ease;
+
     padding: 20px;
+
     position: relative;
     overflow: hidden;
+}
+
+.blend-mode {
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background: linear-gradient(125deg, rgba(255, 255, 255, 0), rgba(255, 0, 0, 0.45));
+    filter: blur(10px);
+    z-index: 0;
 }
 
 .uploader.pulsing {
@@ -71,37 +120,36 @@ nav {
 
 @keyframes pulse {
     0% {
-        transform: scale(0.99);
-        box-shadow: 0 0 0 0 rgba(70, 123, 172, 0.7);
+        /* transform: scale(0.99); */
+        box-shadow: 0 0 0 0 rgba(125, 16, 16, 0.7);
     }
 
     70% {
-        transform: scale(1);
-        box-shadow: 0 0 70px 100px rgba(70, 123, 172, 0);
+        /* transform: scale(1); */
+        box-shadow: 0 0 70px 100px rgba(125, 16, 16, 0);
     }
 
     100% {
-        transform: scale(0.99);
-        box-shadow: 0 0 0px 0px rgba(70, 123, 172, 0);
+        /* transform: scale(0.99); */
+        box-shadow: 0 0 0px 0px rgba(125, 16, 16, 0);
     }
 }
 
 .uploader:hover {
-    background-color: #a7ccd3;
+    /* background-color: #a7ccd3; */
 }
 
 .uploader.dragover {
-    background-color: #d3a7a7;
-    border-color: #8ca5ad;
+    /* background-color: #d3a7a7; */
 }
 
 .uploader.has-file {
-    background-color: #e4f0f3;
+    background-color: rgba(255, 255, 255, 0.3);
 }
 
 .uploader.has-error {
-    background-color: #fde8e8;
-    border-color: #f87171;
+    /* background-color: #fde8e8;
+    border-color: #f87171; */
 }
 
 @keyframes shake {
@@ -131,26 +179,26 @@ nav {
     animation: shake 0.6s cubic-bezier(.36, .07, .19, .97) both;
 }
 
-
 /* ----------------------- Стили для пустого состояния -----------------------*/
 .upload-empty-state {
     text-align: center;
+    z-index: 1;
 }
 
 .upload-icon {
-    width: 60px;
-    height: 60px;
-    fill: #8da7ad;
-    stroke: #8da7ad;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 .upload-text {
-    font-family: Arial, sans-serif;
-    color: #2c3e50;
-    font-size: 16px;
-    margin: 0 0 8px 0;
-    text-align: center;
+    color: #ffffff;
+    font-size: 1.1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.upload-text.diff-row {
+    margin: 15px 0;
 }
 
 .upload-hint {
@@ -161,9 +209,9 @@ nav {
 }
 
 .error-message {
-    color: #dc2626;
+    color: #bd0000;
     font-size: 14px;
-    margin-top: 10px;
+    margin-top: 15px;
     text-align: center;
     padding: 5px 10px;
     border-radius: 4px;
@@ -174,15 +222,110 @@ nav {
     display: block;
 }
 
+.state__btn {
+    padding: 9px 13px;
+    background-image: linear-gradient(to left, #090808, #8d0b0b, #8d0b0b, #090808);
+    background-size: 300%;
+    background-position: 0 0;
+    -webkit-appearance: none !important;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    box-shadow: 2px 3px 8px #430606;
+    transition: all ease 0.3s;
+}
+
+.state__btn:hover {
+    background-position: 100% 0;
+    color: #fff;
+}
+
+#upload-file-btn:disabled {
+    /* background-color: #cccccc; */
+    cursor: not-allowed;
+}
+
+/* --------------------------------- TOOLTIP ----------------------------*/
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+
+    width: 20px;
+    height: 20px;
+    background-color: #6868685e;
+    backdrop-filter: blur(20px);
+    border-radius: 50%;
+    margin-left: 5px;
+
+    color: rgb(255, 255, 255);
+
+    font-size: 0.7rem;
+}
+
+.tooltip__sign {
+    pointer-events: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.tooltip__text {
+    font-size: 0.7rem;
+    line-height: 1rem;
+
+    visibility: hidden;
+    width: 15vw;
+    min-width: 140px;
+
+    background-color: #311212ef;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltip:hover .tooltip__text {
+    visibility: visible;
+    opacity: 1;
+}
+
+.formats {
+    display: none;
+    color: rgb(199, 199, 199);
+
+    font-size: 0.8rem;
+    line-height: 1.2rem;
+    text-align: center;
+}
+
 /* ---------------------- Стили для отображения информации о файле -------------------*/
+.upload-file-state {
+    width: 100%;
+    z-index: 1;
+}
+
 .file-info {
     display: flex;
-    width: 90%;
+    width: 85%;
     align-items: center;
     padding: 15px;
+    margin: 50px auto;
     background-color: white;
-    border-radius: 8px;
+    border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    box-sizing: border-box;
 }
 
 .file-info.anim {
@@ -207,24 +350,7 @@ nav {
 }
 
 .file-preview {
-    width: 80px;
-    height: 80px;
-    margin-right: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 5px;
-    background-color: #f0f2f5;
-}
-
-.video-preview {
-    background-color: #2c3e50;
-}
-
-.video-icon {
-    width: 50px;
-    height: 50px;
-    fill: white;
+    margin-right: 10px;
 }
 
 .file-details {
@@ -251,7 +377,6 @@ nav {
     color: #8da7ad;
     margin: 0;
     font-size: 12px;
-    font-family: monospace;
 }
 
 .clear-file-btn {
@@ -271,55 +396,138 @@ nav {
     background-color: #f0f2f5;
 }
 
-.clear-icon {
-    width: 20px;
-    height: 20px;
-    fill: #7f8c91;
+.state-btn__container {
+    width: 100%;
+    text-align: center;
+}
+
+.state__btn.hidden {
+    display: none;
+    cursor: not-allowed;
+}
+
+/* --------------------- Стили для состояния загрузки ----------------- */
+
+.uploader.uploading {
+    border-radius: 50%;
+    width: 410px;
+    height: 410px;
+}
+
+.upload-progressbar-state {
+    position: relative;
+}
+
+.upload-progressbar-state.hidden {
+    display: none;
+}
+
+.progress-info {
+    color: white;
+    z-index: 1;
+    position: relative;
+    text-align: center;
+}
+
+.progress-info .percent {
+    font-size: 5rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.progress-info .status {
+    font-size: 1.1rem;
 }
 
 /* --------------------- PROGRESSBAR ----------------- */
-.progress-container {
-    display: none;
-    width: 100%;
-    margin-top: 20px;
-    background-color: #f5f5f5;
-    border-radius: 4px;
-    overflow: hidden;
+.progress-circle {
+    position: absolute;
+    transform: rotate(-90deg);
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) rotate(-90deg);
+}
+
+.progress-background {
+    fill: none;
+    stroke: #7a2828;
+    stroke-width: 20;
 }
 
 .progress-bar {
-    height: 20px;
-    background-color: #4CAF50;
-    text-align: center;
-    line-height: 20px;
-    color: white;
-    width: 0%;
-    transition: width 0.3s ease;
+    fill: none;
+    stroke: #ff9898;
+    stroke-width: 20;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.5s ease;
 }
 
-.progress-text {
-    display: inline-block;
-    color: white;
-    font-weight: bold;
-}
+@media (max-width: 700px) {
+    body {
+        background: url("../icons/background-mobile.png");
+        background-size: cover;
+        background-repeat: no-repeat;
+    }
 
-#upload-file-btn {
-    margin-top: 20px;
-    padding: 10px 20px;
-    background-color: #4285f4;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s;
-}
+    .tooltip {
+        display: none;
+    }
 
-#upload-file-btn:hover {
-    background-color: #3367d6;
-}
+    .title-page {
+        margin-top: 40px;
+    }
 
-#upload-file-btn:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
+    .formats {
+        display: block;
+    }
+
+    .upload-text {
+        display: none;
+    }
+
+    .file-info {
+        flex-direction: column;
+        background-color: transparent;
+        box-shadow: none;
+        color: white;
+        text-align: center;
+        margin: 10px auto;
+    }
+
+    .file-preview {
+        margin-right: 0;
+        margin-left: 5px;
+    }
+
+    .clear-file-btn {
+        padding: 4px;
+        margin-top: 5px;
+        margin-left: 0;
+    }
+
+    .uploader.uploading {
+        width: 225px;
+        height: 225px;
+    }
+
+    .progress-info .percent {
+        font-size: 3.5rem;
+    }
+
+    .progress-info .status {
+        font-size: 0.9rem;
+    }
+
+    .progress-background {
+        stroke-width: 10;
+    }
+
+    .progress-bar {
+        stroke-width: 10;
+    }
+
+    .progress-circle circle {
+        r: 78;
+    }
+
 }

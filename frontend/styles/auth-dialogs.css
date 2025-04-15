@@ -1,4 +1,3 @@
-/* Стили для диалоговых окон */
 .auth-dialog {
     max-width: 500px;
     padding: 0 20px;
@@ -8,7 +7,7 @@
 }
 
 .auth-container {
-    min-width: 400px;
+    min-width: 300px;
     border-radius: 8px;
     border: none;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
@@ -61,6 +60,11 @@
     padding: 24px 0;
 }
 
+form .btn-container{
+    width: 100%;
+    text-align: center;
+}
+
 .form-group {
     margin-bottom: 20px;
 }
@@ -84,11 +88,11 @@
 }
 
 .form-group input:focus {
-    border-color: #4a90e2;
+    border-color: #d49696;
     outline: none;
 }
 
-.btn {
+/* .btn {
     display: inline-block;
     padding: 10px 16px;
     background-color: #4a90e2;
@@ -100,11 +104,33 @@
     cursor: pointer;
     transition: background-color 0.2s;
     width: 100%;
+} */
+
+.btn {
+    min-width: 100px;
+    padding: 9px 13px;
+    background-image: linear-gradient(to left, #350d0d, #8d0b0b, #8d0b0b, #2e0808);
+    background-size: 300%;
+    background-position: 0 0;
+    -webkit-appearance: none !important;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    box-shadow: 2px 3px 8px #0000009f;
+    transition: all ease 0.3s;
 }
 
 .btn:hover {
-    background-color: #3a80d2;
+    background-position: 99% 0;
+    color: #fff;
 }
+
+
+/* .btn:hover {
+    background-color: #3a80d2;
+} */
 
 .dialog-footer {
     padding: 0 24px 24px;
@@ -115,7 +141,7 @@
 }
 
 .dialog-footer a {
-    color: #4a90e2;
+    color: #d49696;
     text-decoration: none;
     font-weight: 500;
 }
@@ -172,7 +198,7 @@
 .dialog-actions {
     margin: 24px 0;
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
 }
 
 @keyframes fadeIn {
@@ -198,5 +224,55 @@
 }
 
 .auth-dialog[open] {
+    animation: fadeIn 0.3s ease, slideIn 0.3s ease;
+}
+
+/* ---------------- Стили для информационных окон ------------------ */
+
+.info-dialog {
+    max-width: 500px;
+    padding: 0 20px;
+    margin: auto auto;
+    border: none;
+    background-color: transparent;
+}
+
+.info-container {
+    width: 320px;
+    border-radius: 25px;
+    border: none;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    background-color: #fff;
+    padding: 35px;
+    box-sizing: border-box;
+}
+
+.info-dialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.dialog-info-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.dialog-info-header h2 {
+    font-size: 1.5rem;
+    line-height: 1.3rem;
+    font-weight: 600;
+    color: #202020;
+}
+
+.dialog-actions-info {
+    text-align: center;
+}
+
+.error-info {
+    line-height: 1.4rem;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.info-dialog[open] {
     animation: fadeIn 0.3s ease, slideIn 0.3s ease;
 }

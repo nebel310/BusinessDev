@@ -5,8 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>File Uploader</title>
-    <link rel="stylesheet" href="/styles/index.css">
-    <link rel="stylesheet" href="/styles/auth-dialogs.css">
+
+    <link rel="stylesheet" href="./styles/reset.css">
+    <link rel="stylesheet" href="./styles/index.css">
+    <link rel="stylesheet" href="./styles/auth-dialogs.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
 </head>
 
 <body>
@@ -19,49 +26,64 @@
     </header>
 
     <div class="page-container">
+        <h1 class="title-page">Загрузка видео</h1>
+        <p class="formats">
+            Поддерживаемые форматы: MP4, MOV, WMV, AVI, AVCHD, FLV, SWF, F4V, MKV, WEBM
+        </p>
         <div class="uploader-container">
             <div class="uploader" id="fileUploader">
+                <div class="blend-mode"></div>
                 <input type="file" id="fileInput" style="display: none;" accept="video/*">
 
                 <div class="upload-empty-state" id="emptyState">
+                    <img class="upload-icon" src="./icons/upload-icon.svg" alt="upload-icon">
+
                     <p class="upload-text">
-                        Выберите видеофайл <span>или перетащите его сюда.</span>
+                        Перетащите сюда файл
+                        <span class="tooltip"><span class="tooltip__sign">?</span>
+                            <span class="tooltip__text">
+                                Поддерживаемые форматы: MP4, MOV, WMV, AVI, AVCHD, FLV, SWF, F4V, MKV, WEBM
+                            </span>
+                        </span>
                     </p>
-                    <p class="upload-hint">
-                        Поддерживаемые форматы: MP4, MOV, WMV, AVI, AVCHD, FLV, SWF, F4V, MKV, WEBM
-                    </p>
+                    <p class="upload-text diff-row">или</p>
+                    <div class="btn-container">
+                        <button class="state__btn" id="select-file-btn">Выберите файл</button>
+                    </div>
                     <p class="error-message" id="errorMessage"></p>
                 </div>
 
-                <div class="file-info" id="fileInfo" style="display: none;">
-                    <div class="file-preview video-preview">
-                        <svg viewBox="0 0 24 24" class="video-icon">
-                            <path
-                                d="M18 4v1h-2V4c0-.55-.45-1-1-1H9c-.55 0-1 .45-1 1v1H6V4c0-.55-.45-1-1-1s-1 .45-1 1v16c0 .55.45 1 1 1s1-.45 1-1v-1h2v1c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-1h2v1c0 .55.45 1 1 1s1-.45 1-1V4c0-.55-.45-1-1-1s-1 .45-1 1zM8 17H6v-2h2v2zm0-4H6v-2h2v2zm0-4H6V7h2v2zm10 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z" />
-                        </svg>
+                <div class="upload-file-state">
+                    <div class="file-info" id="fileInfo" style="display: none;">
+                        <div class="file-preview video-preview">
+                            <img class="video-icon" src="./icons/video-icon.svg" alt="video-icon">
+                        </div>
+                        <div class="file-details">
+                            <p class="file-name" id="fileName"></p>
+                            <p class="file-size" id="fileSize"></p>
+                            <p class="file-type" id="fileType"></p>
+                        </div>
+                        <button class="clear-file-btn" id="clearFileBtn" aria-label="Удалить файл">
+                            <img class="trash-icon" src="./icons/trash-icon.svg" alt="trash-icon">
+                        </button>
                     </div>
-                    <div class="file-details">
-                        <p class="file-name" id="fileName"></p>
-                        <p class="file-size" id="fileSize"></p>
-                        <p class="file-type" id="fileType"></p>
+                    <div class="state-btn__container">
+                        <button class="state__btn hidden" id="upload-file-btn">Загрузить</button>
                     </div>
-                    <button class="clear-file-btn" id="clearFileBtn" aria-label="Удалить файл">
-                        <svg viewBox="0 0 24 24" class="clear-icon">
-                            <path
-                                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
-                        </svg>
-                    </button>
+                </div>
+
+                <div class="upload-progressbar-state hidden" id="uploadingState">
+                    <svg class="progress-circle" width="410" height="410" viewBox="0 0 300 300">
+                        <circle class="progress-background" cx="150" cy="150" r="140"></circle>
+                        <circle class="progress-bar" id="progressBar" cx="150" cy="150" r="140"></circle>
+                    </svg>
+                    <div class="progress-info">
+                        <p class="percent">0%</p>
+                        <p class="status">Загрузка на сервер</p>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <div class="progress-container" id="progressContainer">
-            <div class="progress-bar" id="progressBar">
-                <span class="progress-text" id="progressText">0%</span>
-            </div>
-        </div>
-
-        <button id="upload-file-btn">Загрузить</button>
     </div>
 
     <!-- Диалоговое окно входа -->
@@ -85,7 +107,9 @@
                     <label for="login-password">Пароль</label>
                     <input type="password" id="login-password" name="password" required>
                 </div>
-                <button type="submit" class="btn">Войти</button>
+                <div class="btn-container">
+                    <button type="submit" class="btn">Войти</button>
+                </div>
             </form>
             <p class="dialog-footer">Нет аккаунта? <a href="#" id="switch-to-register">Зарегистрироваться</a></p>
             <div id="login-message" class="message"></div>
@@ -121,7 +145,9 @@
                     <label for="register-password-confirm">Подтверждение пароля</label>
                     <input type="password" id="register-password-confirm" name="password-confirm" required>
                 </div>
-                <button type="submit" class="btn">Зарегистрироваться</button>
+                <div class="btn-container">
+                    <button type="submit" class="btn">Зарегистрироваться</button>
+                </div>
             </form>
             <p class="dialog-footer">Уже есть аккаунт? <a href="#" id="switch-to-login">Войти</a></p>
             <div id="register-message" class="message"></div>
@@ -149,9 +175,38 @@
         </div>
     </dialog>
 
+    <!-- Диалоговое окно успешной загрузки видео -->
+    <dialog id="success-dialog" class="info-dialog">
+        <div class="info-container">
+            <div class="dialog-info-header">
+                <img src="./icons/success-icon.svg" alt="success">
+                <h2>Файл успешно загружен</h2>
+            </div>
+            <div class="dialog-actions-info">
+                <button id="back-btn" class="btn back-btn">Выбрать файл</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Диалоговое окно c ошибкой загрузки видео -->
+    <dialog id="error-dialog" class="info-dialog">
+        <div class="info-container">
+            <div class="dialog-info-header">
+                <img src="./icons/error-icon.svg" alt="error">
+                <h2>Ошибка при загрузке файла</h2>
+            </div>
+            <div class="error-info">
+                <p>Возможно файл был поврежден. Попробуйте еще раз или загрузите другой файл </p>
+            </div>
+            <div class="dialog-actions-info">
+                <button id="back-btn" class="btn back-btn">Выбрать файл</button>
+            </div>
+        </div>
+    </dialog>
+
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script type="module" src="/js/main.js"></script>
-    <script type="module" src="/js/auth-dialogs.js"></script>
+    <script type="module" src="./js/main.js"></script>
+    <script type="module" src="./js/auth-dialogs.js"></script>
 </body>
 
 </html>
