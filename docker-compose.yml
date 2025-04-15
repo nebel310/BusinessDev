@@ -24,17 +24,18 @@ services:
       test: ["CMD", "nc", "-z", "localhost", "9092"]
       interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 20
 
   web:
     build: ./backend
     container_name: fastapi_app
+    ports:
+      - "3001:3001"
     environment:
       - DATABASE_URL=postgresql+asyncpg://postgres:123456@db:5432/business_db
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
-      kafka:
-        condition: service_started
+      - kafka
 
   db:
     image: postgres:17.2
