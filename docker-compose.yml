@@ -21,7 +21,23 @@ services:
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT 
     depends_on: 
       - web
-  
+  db:
+    image: postgres:17.2
+    container_name: postgres_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=business_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d business_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   frontend:
     image: andrey444/front_hack:0.2
     container_name: frontend
