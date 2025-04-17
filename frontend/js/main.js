@@ -1,7 +1,4 @@
 //TODO Добавить логику проверки статуса обработки видео
-//TODO Добавить ошибку в диалоговое окно - "ошибка сервера"
-//!BUG баг с refresh - "POST /auth/refresh HTTP/1.1" 422 Unprocessable Content
-//!BUG при нажатии enter в диалоговом окне, закрывает окно, должно сабмитить
 
 document.addEventListener('DOMContentLoaded', function () {
     const fileUploader = document.getElementById('fileUploader');
@@ -112,6 +109,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const progressBar = document.querySelector('.progress-bar');
         const percentElement = document.querySelector('.percent');
         const statusElement = document.querySelector('.status');
+        statusElement.textContent = 'Загрузка на сервер';
 
         let radius;
         if (window.matchMedia('(max-width: 700px)').matches) {
@@ -159,6 +157,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Загрузка файла
     async function uploadFile() {
+        if (!localStorage.getItem('access_token')) {
+            showErrorDialog('Необходимо авторизоваться', 'Пожалуйста, войдите в систему, чтобы загрузить видео.');
+            return
+        }
+
         uploadFileBtn.disabled = true;
         clearFileBtn.disabled = true;
 
@@ -166,8 +169,6 @@ document.addEventListener('DOMContentLoaded', function () {
         await transformToCicle();
 
         setError('');
-
-        //! Проверка на авторизацию должна быть, кастомная ошибка
 
         try {
             const title = encodeURIComponent(currentFile.name);
@@ -204,11 +205,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // updateCircularProgress(100);
 
-            setTimeout(() => successDialog.showModal(), 1000);
-
             try {
                 await checkStatusVideo(videoId);
 
+                setTimeout(() => successDialog.showModal(), 2000);
                 //TODO Тут всплыть окно после успешной обработки видео
 
             } catch (error) {
@@ -218,26 +218,54 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
         } catch (error) {
-            let errorMsg = 'Ошибка при загрузке видео';
-            errorDialog.showModal();
+            let errorTitle = 'Ошибка при загрузке файла';
+            let errorMsg = 'Возможно файл был поврежден. Попробуйте еще раз или загрузите другой файл.';
 
             if (error.response) {
                 console.error('Ошибка от сервера:', error.response);
-                errorMsg = error.response.data.detail || `Ошибка сервера (${error.response.status})`;
+                errorTitle = 'Ошибка сервера';
+                // errorMsg = error.response.data.detail || `Ошибка сервера (${error.response.status})`;
             } else if (error.request) {
                 console.error('Нет ответа от сервера:', error.request);
-                errorMsg = 'Нет ответа от сервера';
+                errorTitle = 'Нет ответа от сервера';
+                errorMsg = 'Сервер недоступен. Пожалуйста, попробуйте позже.';
             } else {
                 console.error('Ошибка настройки запроса:', error.message);
-                errorMsg = `Ошибка запроса: ${error.message}`;
+                // errorMsg = `Ошибка запроса: ${error.message}`;
             }
 
-            setError(errorMsg);
-            hideCircularProgress();
+            showErrorDialog(errorTitle, errorMsg);
+            // setError(errorMsg);
+            // hideCircularProgress();
         } finally {
             uploadFileBtn.disabled = false;
             clearFileBtn.disabled = false;
         }
+    }
+
+    // отображение диалога с ошибкой
+    function showErrorDialog(title, message) {
+        const errorDialog = document.getElementById('error-dialog');
+        const dialogTitle = errorDialog.querySelector('h2');
+        const dialogMessage = errorDialog.querySelector('.error-info p');
+
+        dialogTitle.textContent = title;
+        dialogMessage.textContent = message;
+
+        if (title === "Необходимо авторизоваться") {
+            const actionButton = errorDialog.querySelector('#back-btn');
+
+            const newButton = actionButton.cloneNode(true);
+            actionButton.parentNode.replaceChild(newButton, actionButton);
+
+            newButton.textContent = "Вход";
+            newButton.addEventListener('click', () => {
+                document.getElementById('login-dialog').showModal();
+                errorDialog.close();
+            });
+        }
+
+        errorDialog.showModal();
     }
 
     async function transformToCicle() {

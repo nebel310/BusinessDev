@@ -1,5 +1,4 @@
 .auth-dialog {
-    max-width: 500px;
     padding: 0 20px;
     margin: auto auto;
     border: none;
@@ -7,7 +6,9 @@
 }
 
 .auth-container {
+    width: 25vw;
     min-width: 300px;
+    max-width: 550px;
     border-radius: 8px;
     border: none;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
@@ -152,7 +153,6 @@ form .btn-container{
 
 .message {
     display: none;
-    margin: 0 24px 24px;
     padding: 12px;
     border-radius: 6px;
     font-size: 14px;
@@ -230,7 +230,6 @@ form .btn-container{
 /* ---------------- Стили для информационных окон ------------------ */
 
 .info-dialog {
-    max-width: 500px;
     padding: 0 20px;
     margin: auto auto;
     border: none;
@@ -238,7 +237,9 @@ form .btn-container{
 }
 
 .info-container {
-    width: 320px;
+    width: 23vw;
+    min-width: 300px;
+    max-width: 550px;
     border-radius: 25px;
     border: none;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
@@ -258,7 +259,7 @@ form .btn-container{
 
 .dialog-info-header h2 {
     font-size: 1.5rem;
-    line-height: 1.3rem;
+    line-height: 1.6rem;
     font-weight: 600;
     color: #202020;
 }

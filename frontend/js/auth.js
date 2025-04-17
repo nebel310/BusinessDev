@@ -68,12 +68,11 @@ async function refreshToken() {
     }
     
     try {
-        const response = await fetch(`${API_URL}/auth/refresh`, {
+        const response = await fetch(`${API_URL}/auth/refresh?refresh_token=${encodeURIComponent(refreshToken)}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-            },
-            body: refreshToken
+            }
         });
 
         const data = await response.json();
