@@ -1,3 +1,8 @@
+import time
+#Ждем полного запуска кафки
+time.sleep(30)
+
+
 import asyncio
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi

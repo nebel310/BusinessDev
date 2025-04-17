@@ -6,7 +6,7 @@ RUN npm install -g http-server
 
 COPY . .
 
-VOLUME .:/front
+VOLUME ./frontend:/front
 
 EXPOSE 5500
 
