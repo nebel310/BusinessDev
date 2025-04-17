@@ -27,6 +27,9 @@ services:
       retries: 20
 
   web:
+    volumes:
+      - ./backend:/app
+      - ./uploads:/app/uploads
     build: ./backend
     container_name: fastapi_app
     ports:
