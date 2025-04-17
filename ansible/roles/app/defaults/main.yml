@@ -1,0 +1,10 @@
+---
+app_src: "../backend/"
+app_dest: "/app"
+app_owner: "user"
+app_group: "user"
+app_docker_tag: "0.3"
+app_docker_image: "andrey444/hack:{{ app_docker_tag }}"
+app_container_name: "fastapi_app"
+app_host_port: "3001"
+app_app_port: "3001"

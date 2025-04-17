@@ -59,17 +59,26 @@ async def get_video(video_id: int):
     return video
 
 
+# @router.post("/{video_id}/process")
+# async def process_video(video_id: int, current_user: UserOrm = Depends(get_current_user)):
+#     try:
+#         output_dir = await VideoRepository.process_video(video_id)
+#         return {
+#             "success": True,
+#             "message": "Видео обрабатывается",
+#             "hls_path": output_dir
+#         }
+#     except ValueError as e:
+#         raise HTTPException(400, detail=str(e))
+
+
 @router.post("/{video_id}/process")
-async def process_video(video_id: int, current_user: UserOrm = Depends(get_current_user)):
-    try:
-        output_dir = await VideoRepository.process_video(video_id)
-        return {
-            "success": True,
-            "message": "Видео обрабатывается",
-            "hls_path": output_dir
-        }
-    except ValueError as e:
-        raise HTTPException(400, detail=str(e))
+async def process_video(
+    video_id: int,
+    current_user: UserOrm = Depends(get_current_user)
+):
+    await VideoRepository.start_video_processing(video_id)
+    return {"status": "queued", "message": "Видео поставлено в очередь на обработку"}
 
 
 @router.get("/{video_id}/play")

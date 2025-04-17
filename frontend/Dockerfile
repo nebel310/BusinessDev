@@ -1,10 +1,12 @@
-FROM --platform=linux/amd64 node:18-alpine
+FROM  node:18-alpine
 
 WORKDIR /app
 
 RUN npm install -g http-server
 
 COPY . .
+
+VOLUME ./frontend:/front
 
 EXPOSE 5500
 
