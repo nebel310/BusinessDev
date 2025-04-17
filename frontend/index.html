@@ -84,6 +84,7 @@
                 </div>
             </div>
         </div>
+
     </div>
 
     <!-- Диалоговое окно входа -->
@@ -177,10 +178,15 @@
 
     <!-- Диалоговое окно успешной загрузки видео -->
     <dialog id="success-dialog" class="info-dialog">
+        <!-- Заменить в диалоговом окне успешной загрузки видео -->
         <div class="info-container">
             <div class="dialog-info-header">
                 <img src="./icons/success-icon.svg" alt="success">
                 <h2>Файл успешно загружен и обработан</h2>
+            </div>
+            <div id="video-container">
+                <video id="video-player" controls autoplay></video>
+                <!-- Селектор качества будет добавлен через JavaScript -->
             </div>
             <div class="dialog-actions-info">
                 <button id="back-btn" class="btn back-btn">Выбрать файл</button>
@@ -205,6 +211,7 @@
     </dialog>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script type="module" src="./js/main.js"></script>
     <script type="module" src="./js/auth-dialogs.js"></script>
 </body>

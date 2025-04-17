@@ -170,7 +170,13 @@ async function getCurrentUser() {
 
 // Функция для проверки авторизации
 function isAuthenticated() {
-    return localStorage.getItem('access_token') !== null;
+    try {
+        refreshToken()
+        return localStorage.getItem('access_token') !== null;
+    }
+    catch (error) {
+        return null;
+    }
 }
 
 // Функция для страниц, требующих авторизации

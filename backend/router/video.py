@@ -176,3 +176,23 @@ async def play_video(video_id: int):
         media_type="application/vnd.apple.mpegurl",
         headers={"Cache-Control": "no-cache"}
     )
+
+@router.get("/{video_id}/hls/{file_path:path}")
+async def serve_hls_files(video_id: int, file_path: str):
+    video = await VideoRepository.get_video_by_id(video_id)
+    if not video:
+        raise HTTPException(404, "Видео не найдено")
+    if not video.processed_path:
+        raise HTTPException(400, "Видео ещё не обработано")
+
+    file_full_path = os.path.join(video.processed_path, file_path)
+    if not os.path.exists(file_full_path):
+        raise HTTPException(404, "Файл не найден")
+
+    media_type = "application/vnd.apple.mpegurl" if file_path.endswith(".m3u8") else "video/mp2t"
+    
+    return FileResponse(
+        file_full_path,
+        media_type=media_type,
+        headers={"Cache-Control": "no-cache" if file_path.endswith(".m3u8") else "max-age=31536000"}
+    )
