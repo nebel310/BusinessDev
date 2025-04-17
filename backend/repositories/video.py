@@ -7,6 +7,8 @@ from schemas.video import SVideoUpload
 from utils.storage import save_file_to_server
 from utils.video_processing import convert_to_hls
 from utils.kafka_producer import send_video_processing_task
+from utils.s3_storage import S3Storage
+from config import settings
 
 
 
@@ -20,18 +22,33 @@ class VideoRepository:
                 title=video_data.title,
                 description=video_data.description,
                 original_path="",
+                s3_original_path="",
                 status="uploaded"
             )
             session.add(video)
             await session.flush()
             await session.commit()
 
-            original_path = await save_file_to_server(file, user_id, video.id)
-
-            video.original_path = original_path
-            await session.commit()
-
-            return video
+            try:
+                # Сохраняем локально
+                original_path = await save_file_to_server(file, user_id, video.id)
+                
+                # Сохраняем в S3 (перематываем файл, так как он уже был прочитан)
+                file.file.seek(0)
+                s3_storage = S3Storage()
+                s3_path = await s3_storage.upload_file(file, user_id, video.id)
+                
+                # Обновляем пути в БД
+                video.original_path = original_path
+                video.s3_original_path = s3_path
+                await session.commit()
+                
+                return video
+            except Exception as e:
+                # Если ошибка - удаляем запись из БД
+                await session.delete(video)
+                await session.commit()
+                raise ValueError(f"Ошибка сохранения видео: {str(e)}")
 
 
     @classmethod

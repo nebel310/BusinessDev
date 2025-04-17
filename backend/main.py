@@ -12,6 +12,8 @@ from database import create_tables, delete_tables
 from router.auth import router as auth_router
 from router.video import router as video_router
 from utils.kafka_consumer import consume_video_tasks
+from utils.s3_storage import S3Storage
+from config import settings
 
 
 
@@ -24,6 +26,12 @@ async def lifespan(app: FastAPI):
     print('База готова к работе')
     asyncio.create_task(consume_video_tasks())
     print('Кафка запущена')
+    try:
+        s3 = S3Storage()
+        s3.client.create_bucket(Bucket=settings.S3_BUCKET)
+        print("MinIO инициализирована")
+    except Exception as e:
+        print(f"MinIO ошибка в инициализации: {e}")
     yield
     print('Выключение')
 
