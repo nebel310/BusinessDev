@@ -350,6 +350,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Clear any existing interval before creating a new one
             if (processingInterval) {
                 clearInterval(processingInterval);
+                processingInterval = null;
             }
 
             processingInterval = setInterval(async () => {
@@ -368,15 +369,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         isCheckingStatus = false;
                         updateCircularProgress(100, 'Обработка завершена');
 
-                        // Only get HLS URL once
-                        if (!hlsUrl) {
-                            await getHlsUrl(id);
+                        // Всегда получаем URL при завершении обработки
+                        await getHlsUrl(id);
 
-                            setTimeout(() => {
-                                successDialog.showModal();
-                                playVideoHLS(id);
-                            }, 1000);
-                        }
+                        setTimeout(() => {
+                            successDialog.showModal();
+                            playVideoHLS(id);
+                        }, 1000);
                     }
                 } catch (error) {
                     console.error('Ошибка при проверке статуса видео:', error);
@@ -401,7 +400,7 @@ document.addEventListener('DOMContentLoaded', function () {
             showErrorDialog(errorTitle, errorMsg);
         }
     }
-
+    
     // Запуск процесса обработки видео
     async function processVideo(id) {
         try {
@@ -665,11 +664,15 @@ document.addEventListener('DOMContentLoaded', function () {
     function reset() {
         currentFile = null;
         fileInput.value = '';
+        videoId = null;  // Сбрасываем ID видео
+        hlsUrl = null;   // Сбрасываем URL для HLS
 
         if (processingInterval) {
             clearInterval(processingInterval);
             processingInterval = null;
         }
+
+        isCheckingStatus = false;  // Сбрасываем флаг проверки статуса
 
         if (successDialog && typeof successDialog.close === 'function') {
             successDialog.close();
