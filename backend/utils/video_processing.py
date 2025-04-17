@@ -33,7 +33,7 @@ async def convert_to_hls(input_path: str, output_dir: str) -> List[str]:
 
         # Команда FFmpeg для конвертации
         cmd = [
-            "C:/ffmpeg/bin/ffmpeg.exe",
+            "ffmpeg",
             "-i", input_path,
             "-vf", f"scale={resolution}",
             "-c:v", "libx264",
