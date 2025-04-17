@@ -8,6 +8,11 @@ services:
     environment:
       - MINIO_ROOT_USER=minioadmin
       - MINIO_ROOT_PASSWORD=minioadmin
+      - MINIO_BROWSER=on
+      - MINIO_SERVER_URL=http://localhost:9000
+      - MINIO_ALLOWED_ORIGINS=*
+      - MINIO_API_ACCESS_KEY=minioadmin
+      - MINIO_API_SECRET_KEY=minioadmin
     volumes:
       - minio_data:/data
     command: server /data --console-address ":9001"
@@ -56,8 +61,10 @@ services:
     environment:
       - DATABASE_URL=postgresql+asyncpg://postgres:123456@db:5432/business_db
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - CLEAN_S3_ON_START=true
     depends_on:
       - kafka
+      - db
 
   db:
     image: postgres:17.2

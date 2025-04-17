@@ -1,10 +1,12 @@
 import os
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse, RedirectResponse
 from schemas.video import SVideoUpload, SVideo, SVideoHLSPlaylist
 from repositories.video import VideoRepository
 from utils.security import get_current_user
 from models.auth import UserOrm
+from utils.s3_storage import S3Storage
+from config import settings
 
 
 
@@ -22,11 +24,15 @@ async def upload_video(
     video_data: SVideoUpload = Depends(),
     current_user: UserOrm = Depends(get_current_user)
 ):
+    """Загрузка видео в оба хранилища"""
     if not file.content_type.startswith("video/"):
         raise HTTPException(400, "Файл не является видео")
 
-    video = await VideoRepository.create_video(current_user.id, video_data, file)
-    return video
+    try:
+        video = await VideoRepository.create_video(current_user.id, video_data, file)
+        return video
+    except Exception as e:
+        raise HTTPException(500, f"Ошибка загрузки: {str(e)}")
 
 
 @router.get("/stream/{video_id}")
@@ -59,26 +65,98 @@ async def get_video(video_id: int):
     return video
 
 
-# @router.post("/{video_id}/process")
-# async def process_video(video_id: int, current_user: UserOrm = Depends(get_current_user)):
-#     try:
-#         output_dir = await VideoRepository.process_video(video_id)
-#         return {
-#             "success": True,
-#             "message": "Видео обрабатывается",
-#             "hls_path": output_dir
-#         }
-#     except ValueError as e:
-#         raise HTTPException(400, detail=str(e))
-
-
 @router.post("/{video_id}/process")
 async def process_video(
     video_id: int,
     current_user: UserOrm = Depends(get_current_user)
 ):
-    await VideoRepository.start_video_processing(video_id)
-    return {"status": "queued", "message": "Видео поставлено в очередь на обработку"}
+    """Обработка видео в оба хранилища"""
+    try:
+        result = await VideoRepository.process_video(video_id)
+        return {
+            "success": True,
+            "message": "Видео обработано",
+            "local_path": result["local"],
+            "s3_path": result["s3"]
+        }
+    except ValueError as e:
+        raise HTTPException(400, detail=str(e))
+    
+
+@router.get("/play_loc/{video_id}/master")
+async def play_local_master(video_id: int):
+    """Возвращает master.m3u8 из локального хранилища"""
+    video = await VideoRepository.get_video_by_id(video_id)
+    if not video or not video.processed_path:
+        raise HTTPException(404, "Видео не найдено или не обработано")
+    
+    master_path = f"{video.processed_path}/master.m3u8"
+    if not os.path.exists(master_path):
+        raise HTTPException(404, "Файл не найден")
+    
+    return FileResponse(
+        master_path,
+        media_type="application/vnd.apple.mpegurl"
+    )
+
+
+@router.get("/play_loc/{video_id}/{quality}")
+async def play_local_quality(video_id: int, quality: str):
+    """Возвращает сегменты нужного качества из локального хранилища"""
+    video = await VideoRepository.get_video_by_id(video_id)
+    if not video or not video.processed_path:
+        raise HTTPException(404, "Видео не найдено или не обработано")
+    
+    ts_dir = f"{video.processed_path}/{quality}_ts"
+    if not os.path.exists(ts_dir):
+        raise HTTPException(404, "Качество не найдено")
+    
+    return FileResponse(
+        f"{video.processed_path}/{quality}.m3u8",
+        media_type="application/vnd.apple.mpegurl"
+    )
+
+
+@router.get("/play_s3/{video_id}/master")
+async def play_s3_master(video_id: int):
+    """Возвращает master.m3u8 из S3"""
+    video = await VideoRepository.get_video_by_id(video_id)
+    if not video or not video.s3_processed_path:
+        raise HTTPException(404, "Видео не найдено или не обработано")
+    
+    s3 = S3Storage()
+    master_key = f"{video.s3_processed_path}/master.m3u8"
+    
+    try:
+        url = s3.client.generate_presigned_url(
+            'get_object',
+            Params={'Bucket': settings.S3_BUCKET, 'Key': master_key},
+            ExpiresIn=3600
+        )
+        return {"url" : str(url)}
+    except Exception as e:
+        raise HTTPException(500, f"Ошибка S3: {str(e)}")
+
+
+@router.get("/play_s3/{video_id}/{quality}")
+async def play_s3_quality(video_id: int, quality: str):
+    """Возвращает сегменты нужного качества из S3"""
+    video = await VideoRepository.get_video_by_id(video_id)
+    if not video or not video.s3_processed_path:
+        raise HTTPException(404, "Видео не найдено или не обработано")
+    
+    s3 = S3Storage()
+    playlist_key = f"{video.s3_processed_path}/{quality}.m3u8"
+    
+    try:
+        url = s3.client.generate_presigned_url(
+            'get_object',
+            Params={'Bucket': settings.S3_BUCKET, 'Key': playlist_key},
+            ExpiresIn=3600
+        )
+        return {"url" : str(url)}
+    except Exception as e:
+        raise HTTPException(500, f"Ошибка S3: {str(e)}")
 
 
 @router.get("/{video_id}/play")
